@@ -2,6 +2,10 @@ variable "aws_region" {
   default = "us-west-1"
 }
 
+variable "ami_id" {
+  default = "ami-0151cebd38515a41d"
+}
+
 variable "key_name" {
   default = "pg"
 }
