@@ -10,6 +10,7 @@ resource "aws_instance" "pg" {
   subnet_id                   = data.aws_subnet.public[0].id
   vpc_security_group_ids      = [aws_security_group.pg.id]
   associate_public_ip_address = true
+  iam_instance_profile        = aws_iam_instance_profile.pg.name
 
   root_block_device {
     volume_type = "gp3"

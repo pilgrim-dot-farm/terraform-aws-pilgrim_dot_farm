@@ -30,6 +30,15 @@ resource "aws_vpc_security_group_ingress_rule" "alb_ec2" {
   ip_protocol                  = "tcp"
 }
 
+# Tailscale
+resource "aws_vpc_security_group_ingress_rule" "ts" {
+  security_group_id            = aws_security_group.pg.id
+  cidr_ipv4                    = "203.0.113.10/32"
+  from_port                    = 41641
+  to_port                      = 41641
+  ip_protocol                  = "udp"
+}
+
 
 ###############################################################################
 # ALB
@@ -78,4 +87,17 @@ resource "aws_vpc_security_group_egress_rule" "all_tcp" {
   from_port         = 0
   to_port           = 65535
   ip_protocol       = "tcp"
+}
+
+resource "aws_vpc_security_group_egress_rule" "all_udp" {
+  for_each = {
+    ec2 = aws_security_group.pg.id
+    alb = aws_security_group.lb.id
+  }
+
+  security_group_id = each.value
+  cidr_ipv4         = var.egress_cidr_blocks[0]
+  from_port         = 0
+  to_port           = 65535
+  ip_protocol       = "udp"
 }
