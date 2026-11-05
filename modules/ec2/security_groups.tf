@@ -1,7 +1,8 @@
 locals {
   front_end_sg_ids = [
     aws_security_group.pg.id,
-    aws_security_group.cache.id
+    aws_security_group.cache.id,
+    aws_security_group.db.id
   ]
 }
 ###############################################################################
@@ -97,6 +98,27 @@ resource "aws_vpc_security_group_ingress_rule" "cache" {
   referenced_security_group_id = aws_security_group.pg.id
   from_port                    = var.cache_port
   to_port                      = var.cache_port
+  ip_protocol                  = "tcp"
+}
+
+###############################################################################
+# RDS
+###############################################################################
+resource "aws_security_group" "db" {
+  name        = "${var.instance_name}-db"
+  description = "PostgreSQL access"
+  vpc_id      = data.aws_vpc.default.id
+
+  tags = {
+    Name = "${var.instance_name}-db"
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db" {
+  security_group_id            = aws_security_group.db.id
+  referenced_security_group_id = aws_security_group.pg.id
+  from_port                    = var.db_port
+  to_port                      = var.db_port
   ip_protocol                  = "tcp"
 }
 

@@ -1,0 +1,39 @@
+resource "aws_db_subnet_group" "db" {
+  name       = "${var.instance_name}-db"
+  subnet_ids = data.aws_subnets.public.ids
+
+  tags = {
+    Name = "${var.instance_name}-db"
+  }
+}
+
+resource "aws_db_instance" "db" {
+  identifier     = "${var.instance_name}-db"
+  engine         = "postgres"
+  engine_version = "18.6"
+  instance_class = "db.t4g.micro"
+
+  allocated_storage = 20
+  storage_type      = "gp3"
+  storage_encrypted = true
+
+  db_name                      = "pilgrim"
+  username                     = "pilgrim"
+  manage_master_user_password  = true
+  port                         = var.db_port
+  db_subnet_group_name         = aws_db_subnet_group.db.name
+  vpc_security_group_ids       = [aws_security_group.db.id]
+  publicly_accessible          = false
+  multi_az                     = false
+  auto_minor_version_upgrade   = true
+  backup_retention_period      = 1
+  skip_final_snapshot          = false
+  final_snapshot_identifier    = "${var.instance_name}-db-final"
+  copy_tags_to_snapshot        = true
+  monitoring_interval          = 0
+  performance_insights_enabled = false
+
+  tags = {
+    Name = "${var.instance_name}-db"
+  }
+}

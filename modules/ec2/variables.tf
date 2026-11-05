@@ -65,3 +65,7 @@ variable "egress_cidr_blocks" {
 variable "cache_port" {
   default = 6379
 }
+
+variable "db_port" {
+  default = 5432
+}

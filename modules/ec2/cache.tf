@@ -25,8 +25,3 @@ resource "aws_elasticache_serverless_cache" "cache" {
     Name = "${var.instance_name}-cache"
   }
 }
-
-output "cache_url" {
-  description = "TLS Valkey URL, reachable from the EC2 instance"
-  value       = "rediss://${aws_elasticache_serverless_cache.cache.endpoint[0].address}:${aws_elasticache_serverless_cache.cache.endpoint[0].port}"
-}

@@ -41,3 +41,23 @@ output "mac_studio_user_arn" {
   description = "IAM user with read/write access to both buckets"
   value       = aws_iam_user.mac_studio.arn
 }
+
+output "db_endpoint" {
+  description = "Private PostgreSQL host:port, reachable from the EC2 instance"
+  value       = aws_db_instance.db.endpoint
+}
+
+output "db_name" {
+  description = "Initial PostgreSQL database name"
+  value       = aws_db_instance.db.db_name
+}
+
+output "db_master_user_secret_arn" {
+  description = "Secrets Manager secret containing the RDS-managed login credentials"
+  value       = aws_db_instance.db.master_user_secret[0].secret_arn
+}
+
+output "cache_url" {
+  description = "TLS Valkey URL, reachable from the EC2 instance"
+  value       = "rediss://${aws_elasticache_serverless_cache.cache.endpoint[0].address}:${aws_elasticache_serverless_cache.cache.endpoint[0].port}"
+}
