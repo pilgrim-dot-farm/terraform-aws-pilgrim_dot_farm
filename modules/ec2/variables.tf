@@ -61,3 +61,7 @@ variable "egress_cidr_blocks" {
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
+
+variable "cache_port" {
+  default = 6379
+}

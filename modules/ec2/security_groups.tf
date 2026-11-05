@@ -1,3 +1,9 @@
+locals {
+  front_end_sg_ids = [
+    aws_security_group.pg.id,
+    aws_security_group.cache.id
+  ]
+}
 ###############################################################################
 # EC2
 ###############################################################################
@@ -71,6 +77,27 @@ resource "aws_vpc_security_group_ingress_rule" "http" {
   from_port         = 80
   to_port           = 80
   ip_protocol       = "tcp"
+}
+
+###############################################################################
+# ELASTICACHE
+###############################################################################
+resource "aws_security_group" "cache" {
+  name        = "${var.instance_name}-cache"
+  description = "Valkey access from the EC2 instance"
+  vpc_id      = data.aws_vpc.default.id
+
+  tags = {
+    Name = "${var.instance_name}-cache"
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "cache" {
+  security_group_id            = aws_security_group.cache.id
+  referenced_security_group_id = aws_security_group.pg.id
+  from_port                    = var.cache_port
+  to_port                      = var.cache_port
+  ip_protocol                  = "tcp"
 }
 
 ###############################################################################
