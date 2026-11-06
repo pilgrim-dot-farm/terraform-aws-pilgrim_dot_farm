@@ -37,6 +37,16 @@ resource "aws_vpc_security_group_ingress_rule" "alb_ec2" {
   ip_protocol                  = "tcp"
 }
 
+# LiteLLM relay on the bastion (SCALABILITY.md Step 5 addendum): the Fargate
+# tasks carry this same group, so admit :4000 from itself.
+resource "aws_vpc_security_group_ingress_rule" "litellm_relay" {
+  security_group_id            = aws_security_group.pg.id
+  referenced_security_group_id = aws_security_group.pg.id
+  from_port                    = 4000
+  to_port                      = 4000
+  ip_protocol                  = "tcp"
+}
+
 # Tailscale
 resource "aws_vpc_security_group_ingress_rule" "ts" {
   security_group_id = aws_security_group.pg.id

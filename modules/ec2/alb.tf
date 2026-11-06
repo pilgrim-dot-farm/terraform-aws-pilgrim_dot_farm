@@ -72,7 +72,7 @@ resource "aws_lb_target_group" "pg" {
   vpc_id      = data.aws_vpc.default.id
 
   health_check {
-    path     = "/edge-health"
+    path     = "/api/health"
     port     = "traffic-port"
     protocol = "HTTP"
   }

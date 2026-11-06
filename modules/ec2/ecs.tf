@@ -42,6 +42,12 @@ module "ecs" {
         app = {
           image     = var.ecs_container_image
           essential = true
+
+          # Bump the release to redeploy an image published under the same tag.
+          dockerLabels = {
+            release = var.ecs_release
+          }
+
           portMappings = [{
             name          = "http"
             containerPort = var.ecs_container_port
@@ -61,6 +67,15 @@ module "ecs" {
 
       iam_role_arn = local.pg_role_arn
 
+      # The application reads its database and Stripe secrets at runtime.
+      # The execution role needs no secret access: there are no `secrets:` entries.
+      tasks_iam_role_statements = [
+        {
+          actions   = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
+          resources = [local.db_secret_arn, local.stripe_secret_arn]
+        }
+      ]
+
       task_exec_secret_arns    = []
       task_exec_ssm_param_arns = []
     }
@@ -74,5 +89,6 @@ module "ecs" {
   depends_on = [
     aws_lb_listener.https,
     aws_route_table_association.private,
+    aws_secretsmanager_secret_version.stripe,
   ]
 }

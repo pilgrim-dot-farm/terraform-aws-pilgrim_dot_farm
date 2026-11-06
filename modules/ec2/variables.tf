@@ -80,6 +80,12 @@ variable "ecs_container_image" {
   default     = "pilgrimdotfarm/front-end:latest"
 }
 
+variable "ecs_release" {
+  description = "Change this value to create a new task definition revision and redeploy the current image tag."
+  type        = string
+  default     = "4"
+}
+
 variable "ecs_container_port" {
   description = "Port the application container listens on; the existing security group allows 8080 from the ALB."
   type        = number
