@@ -54,12 +54,12 @@ output "db_name" {
 
 output "db_master_user_secret_arn" {
   description = "Secrets Manager secret containing the RDS-managed login credentials"
-  value       = aws_db_instance.db.master_user_secret[0].secret_arn
+  value       = local.db_secret_arn
 }
 
 output "cache_url" {
   description = "TLS Valkey URL, reachable from the EC2 instance"
-  value       = "rediss://${aws_elasticache_serverless_cache.cache.endpoint[0].address}:${aws_elasticache_serverless_cache.cache.endpoint[0].port}"
+  value       = local.redis_url
 }
 
 #output "ecs_cluster_arn" {

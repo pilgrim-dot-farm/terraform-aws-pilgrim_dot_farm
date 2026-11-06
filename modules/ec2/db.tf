@@ -1,3 +1,7 @@
+locals {
+  db_secret_arn = aws_db_instance.db.master_user_secret[0].secret_arn
+}
+
 resource "aws_db_subnet_group" "db_private" {
   name       = "${var.instance_name}-db-private"
   subnet_ids = local.private_subnet_ids

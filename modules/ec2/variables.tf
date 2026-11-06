@@ -77,12 +77,7 @@ variable "ecs_count" {
 variable "ecs_container_image" {
   description = "Application image URI (Linux x86_64). Leave null to create only the ECS cluster until the image is ready."
   type        = string
-  default     = null
-
-  validation {
-    condition     = var.ecs_container_image == null ? true : trimspace(var.ecs_container_image) != ""
-    error_message = "ecs_container_image must be null or a non-empty image URI."
-  }
+  default     = "pilgrimdotfarm/front-end:latest"
 }
 
 variable "ecs_container_port" {

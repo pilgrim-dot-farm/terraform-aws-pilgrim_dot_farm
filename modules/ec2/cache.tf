@@ -1,4 +1,7 @@
-# Leave minimum usage limits unset to retain Valkey's 100 MB billing floor.
+locals {
+  redis_url = "rediss://${aws_elasticache_serverless_cache.cache.endpoint[0].address}:${aws_elasticache_serverless_cache.cache.endpoint[0].port}"
+}
+
 resource "aws_elasticache_serverless_cache" "cache" {
   name                 = "${var.instance_name}-cache"
   description          = "Serverless Valkey cache for ${var.instance_name}"
