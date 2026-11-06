@@ -72,10 +72,16 @@ data "aws_iam_policy_document" "s3_read_write" {
     ]
     resources = [for bucket in aws_s3_bucket.pilgrim : "${bucket.arn}/*"]
   }
-} 
+}
 
 resource "aws_iam_user_policy" "mac_studio_s3" {
   name   = "pilgrim-buckets-read-write"
   user   = aws_iam_user.mac_studio.name
   policy = data.aws_iam_policy_document.s3_read_write.json
+}
+
+resource "aws_iam_user_policy" "mac_studio_secrets" {
+  name = "pilgrim-secrets-read"
+  user = aws_iam_user.mac_studio.name
+  policy = data.aws_iam_policy_document.secrets_read.json
 }

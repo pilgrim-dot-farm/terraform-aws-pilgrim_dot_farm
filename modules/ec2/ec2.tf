@@ -12,6 +12,13 @@ resource "aws_instance" "pg" {
   associate_public_ip_address = true
   iam_instance_profile        = aws_iam_instance_profile.pg.name
 
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
+    instance_metadata_tags      = "enabled"
+  }
+
   root_block_device {
     volume_type = "gp3"
     volume_size = var.disk_size
