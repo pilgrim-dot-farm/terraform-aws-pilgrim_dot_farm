@@ -29,7 +29,15 @@ module "ecs" {
       create_security_group = false
       security_group_ids    = local.front_end_sg_ids
 
-      # No load_balancer block yet: the ALB continues to target the EC2 instance.
+      # ECS registers and deregisters task IPs as tasks start and stop.
+      load_balancer = {
+        app = {
+          target_group_arn = aws_lb_target_group.pg.arn
+          container_name   = "app"
+          container_port   = var.ecs_container_port
+        }
+      }
+
       container_definitions = {
         app = {
           image     = var.ecs_container_image
@@ -69,4 +77,7 @@ module "ecs" {
   tags = {
     Name = "${var.instance_name}-ecs"
   }
+
+  # The target group must be associated with the ALB before ECS uses it.
+  depends_on = [aws_lb_listener.https]
 }

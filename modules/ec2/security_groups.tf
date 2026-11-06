@@ -28,22 +28,22 @@ resource "aws_vpc_security_group_ingress_rule" "ssh" {
   ip_protocol       = "tcp"
 }
 
-# HTTP from ALB to EC2
+# HTTP from ALB to Fargate tasks using the shared front-end security group.
 resource "aws_vpc_security_group_ingress_rule" "alb_ec2" {
   security_group_id            = aws_security_group.pg.id
   referenced_security_group_id = aws_security_group.lb.id
-  from_port                    = 8080
-  to_port                      = 8080
+  from_port                    = var.ecs_container_port
+  to_port                      = var.ecs_container_port
   ip_protocol                  = "tcp"
 }
 
 # Tailscale
 resource "aws_vpc_security_group_ingress_rule" "ts" {
-  security_group_id            = aws_security_group.pg.id
-  cidr_ipv4                    = "203.0.113.10/32"
-  from_port                    = 41641
-  to_port                      = 41641
-  ip_protocol                  = "udp"
+  security_group_id = aws_security_group.pg.id
+  cidr_ipv4         = "203.0.113.10/32"
+  from_port         = 41641
+  to_port           = 41641
+  ip_protocol       = "udp"
 }
 
 

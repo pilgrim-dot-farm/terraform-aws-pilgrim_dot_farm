@@ -77,9 +77,3 @@ resource "aws_lb_target_group" "pg" {
     protocol = "HTTP"
   }
 }
-
-resource "aws_lb_target_group_attachment" "pg" {
-  target_group_arn = aws_lb_target_group.pg.arn
-  target_id        = aws_instance.pg.private_ip
-  port             = 8080
-}
