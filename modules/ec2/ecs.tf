@@ -49,17 +49,9 @@ module "ecs" {
           }]
 
           environment = [
-            {
-              name  = "REDIS_URL"
-              value = local.redis_url
-            },
-            {
-              name  = "DATABASE_URL"
-              value = "postgresql://${aws_db_instance.db.username}@${aws_db_instance.db.endpoint}/${aws_db_instance.db.db_name}?sslmode=require"
-            },
-            {
-              name  = "DB_PASS_SECRET_ARN"
-              value = local.db_secret_arn
+            for name, value in local.app_environment : {
+              name  = name
+              value = value
             }
           ]
 
@@ -78,6 +70,9 @@ module "ecs" {
     Name = "${var.instance_name}-ecs"
   }
 
-  # The target group must be associated with the ALB before ECS uses it.
-  depends_on = [aws_lb_listener.https]
+  # Wait for both the ALB association and private-subnet egress before starting tasks.
+  depends_on = [
+    aws_lb_listener.https,
+    aws_route_table_association.private,
+  ]
 }

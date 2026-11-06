@@ -1,6 +1,6 @@
 locals {
   private_subnet_ids   = aws_subnet.private.*.id
-  private_subnet_cidrs = [for val in [48, 64]: "172.31.${val}.0/20"]
+  private_subnet_cidrs = [for val in [48, 64] : "172.31.${val}.0/20"]
 }
 data "aws_vpc" "default" {
   default = true
@@ -39,4 +39,44 @@ resource "aws_subnet" "private" {
   tags = {
     Name = "private-${count.index}"
   }
+}
+
+# Share one public NAT gateway across the private subnets. The default VPC's
+# public subnets already route internet traffic through its internet gateway.
+resource "aws_eip" "nat" {
+  domain = "vpc"
+
+  tags = {
+    Name = "${var.instance_name}-nat"
+  }
+}
+
+resource "aws_nat_gateway" "private_egress" {
+  allocation_id     = aws_eip.nat.id
+  subnet_id         = sort(data.aws_subnets.public.ids)[0]
+  connectivity_type = "public"
+
+  tags = {
+    Name = "${var.instance_name}-nat"
+  }
+}
+
+resource "aws_route_table" "private" {
+  vpc_id = data.aws_vpc.default.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.private_egress.id
+  }
+
+  tags = {
+    Name = "${var.instance_name}-private"
+  }
+}
+
+resource "aws_route_table_association" "private" {
+  count = length(local.private_subnet_cidrs)
+
+  subnet_id      = aws_subnet.private[count.index].id
+  route_table_id = aws_route_table.private.id
 }

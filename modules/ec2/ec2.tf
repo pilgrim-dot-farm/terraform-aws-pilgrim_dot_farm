@@ -21,9 +21,9 @@ resource "aws_instance" "pg" {
     }
   }
 
-  tags = {
+  tags = merge(local.app_environment, {
     Name = var.instance_name
-  }
+  })
 }
 
 # Elastic IP bound to the instance so the public address is stable.
