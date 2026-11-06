@@ -69,3 +69,29 @@ variable "cache_port" {
 variable "db_port" {
   default = 5432
 }
+
+variable "ecs_count" {
+  default = 1
+}
+
+variable "ecs_container_image" {
+  description = "Application image URI (Linux x86_64). Leave null to create only the ECS cluster until the image is ready."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.ecs_container_image == null ? true : trimspace(var.ecs_container_image) != ""
+    error_message = "ecs_container_image must be null or a non-empty image URI."
+  }
+}
+
+variable "ecs_container_port" {
+  description = "Port the application container listens on; the existing security group allows 8080 from the ALB."
+  type        = number
+  default     = 8080
+
+  validation {
+    condition     = var.ecs_container_port >= 1 && var.ecs_container_port <= 65535 && floor(var.ecs_container_port) == var.ecs_container_port
+    error_message = "ecs_container_port must be an integer between 1 and 65535."
+  }
+}

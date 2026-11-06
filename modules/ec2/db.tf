@@ -1,9 +1,9 @@
-resource "aws_db_subnet_group" "db" {
-  name       = "${var.instance_name}-db"
-  subnet_ids = data.aws_subnets.public.ids
+resource "aws_db_subnet_group" "db_private" {
+  name       = "${var.instance_name}-db-private"
+  subnet_ids = local.private_subnet_ids
 
   tags = {
-    Name = "${var.instance_name}-db"
+    Name = "${var.instance_name}-db-private"
   }
 }
 
@@ -21,7 +21,7 @@ resource "aws_db_instance" "db" {
   username                     = "pilgrim"
   manage_master_user_password  = true
   port                         = var.db_port
-  db_subnet_group_name         = aws_db_subnet_group.db.name
+  db_subnet_group_name         = aws_db_subnet_group.db_private.name
   vpc_security_group_ids       = [aws_security_group.db.id]
   publicly_accessible          = false
   multi_az                     = false

@@ -61,3 +61,13 @@ output "cache_url" {
   description = "TLS Valkey URL, reachable from the EC2 instance"
   value       = "rediss://${aws_elasticache_serverless_cache.cache.endpoint[0].address}:${aws_elasticache_serverless_cache.cache.endpoint[0].port}"
 }
+
+#output "ecs_cluster_arn" {
+#  description = "ARN of the Fargate ECS cluster"
+#  value       = module.ecs.cluster_arn
+#}
+#
+#output "ecs_service_name" {
+#  description = "Application ECS service name, or null until an image is configured"
+#  value       = try(module.ecs.services["app"].name, null)
+#}

@@ -5,7 +5,7 @@ resource "aws_elasticache_serverless_cache" "cache" {
   engine               = "valkey"
   major_engine_version = "9"
 
-  subnet_ids         = data.aws_subnets.public.ids
+  subnet_ids         = local.private_subnet_ids
   security_group_ids = [aws_security_group.cache.id]
 
   snapshot_retention_limit = 0
