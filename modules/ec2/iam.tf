@@ -1,5 +1,10 @@
 locals {
   pg_role_arn = aws_iam_role.pg.arn
+
+  log_read_write_users = toset([
+    aws_iam_user.mac_studio.name,
+    aws_iam_user.logs.name
+  ])
 }
 
 ###############################################################################
@@ -113,7 +118,9 @@ resource "aws_iam_user" "logs" {
 }
 
 resource "aws_iam_user_policy" "logs" {
-  name = "logs-read-write"
-  user = aws_iam_user.logs.name
+  for_each = local.log_read_write_users
+
+  name = "${each.value}-logs-read-write"
+  user = each.value
   policy = data.aws_iam_policy_document.logs_read_write.json
 }
