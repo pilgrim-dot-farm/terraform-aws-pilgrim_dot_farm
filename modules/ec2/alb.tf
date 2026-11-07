@@ -71,9 +71,21 @@ resource "aws_lb_target_group" "pg" {
   target_type = "ip"
   vpc_id      = data.aws_vpc.default.id
 
+  # Traffic-path check from the ALB. /api/health is always 200 while the app
+  # runs (an off-air station still answers), so a failure here means the task
+  # is unreachable or wedged: two good answers 15 s apart put a new task in
+  # service, three misses take one out. Draining waits 30 s, not the 300 s
+  # default, since the app holds no long requests.
   health_check {
-    path     = "/api/health"
-    port     = "traffic-port"
-    protocol = "HTTP"
+    path                = "/api/health"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+    matcher             = "200"
+    interval            = 15
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
   }
+
+  deregistration_delay = 30
 }

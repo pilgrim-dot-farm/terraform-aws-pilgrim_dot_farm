@@ -20,6 +20,12 @@ module "ecs" {
       enable_autoscaling       = false
       enable_execute_command   = false
 
+      health_check_grace_period_seconds = 60
+      deployment_circuit_breaker = {
+        enable   = true
+        rollback = true
+      }
+
       runtime_platform = {
         cpu_architecture        = "ARM64"
         operating_system_family = "LINUX"
@@ -53,6 +59,17 @@ module "ecs" {
             containerPort = var.ecs_container_port
             protocol      = "tcp"
           }]
+
+          healthCheck = {
+            command = [
+              "CMD", "python", "-c",
+              "import sys, urllib.request; r = urllib.request.urlopen('http://127.0.0.1:${var.ecs_container_port}/api/health', timeout=3); sys.exit(0 if r.status == 200 else 1)",
+            ]
+            interval    = 15
+            timeout     = 3
+            retries     = 3
+            startPeriod = 20
+          }
 
           environment = [
             for name, value in local.app_environment : {
