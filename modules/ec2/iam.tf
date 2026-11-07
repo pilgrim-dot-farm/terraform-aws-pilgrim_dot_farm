@@ -2,6 +2,9 @@ locals {
   pg_role_arn = aws_iam_role.pg.arn
 }
 
+###############################################################################
+# ROLE SETUP
+###############################################################################
 data "aws_iam_policy_document" "ec2_trust" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -22,24 +25,6 @@ resource "aws_iam_instance_profile" "pg" {
   role = aws_iam_role.pg.name
 }
 
-data "aws_iam_policy_document" "s3_read" {
-  statement {
-    actions   = ["s3:ListBucket", "s3:GetBucketLocation"]
-    resources = [for bucket in aws_s3_bucket.pilgrim : bucket.arn]
-  }
-  statement {
-    actions   = ["s3:GetObject"]
-    resources = [for bucket in aws_s3_bucket.pilgrim : "${bucket.arn}/*"]
-  }
-}
-
-data "aws_iam_policy_document" "secrets_read" {
-  statement {
-    actions   = ["secretsmanager:GetSecretValue"]
-    resources = [local.db_secret_arn]
-  }
-}
-
 resource "aws_iam_role_policy" "pg_s3_read" {
   name   = "pilgrim-buckets-read"
   role   = aws_iam_role.pg.id
@@ -52,8 +37,24 @@ resource "aws_iam_role_policy" "pg_secrets_read" {
   policy = data.aws_iam_policy_document.secrets_read.json
 }
 
-resource "aws_iam_user" "mac_studio" {
-  name = "mac-studio"
+resource "aws_iam_role_policy" "pg_logs_read_write" {
+  name   = "pilgrim-logs-read-write"
+  role   = aws_iam_role.pg.id
+  policy = data.aws_iam_policy_document.logs_read_write.json
+}
+
+###############################################################################
+# POLICY DOCS
+###############################################################################
+data "aws_iam_policy_document" "s3_read" {
+  statement {
+    actions   = ["s3:ListBucket", "s3:GetBucketLocation"]
+    resources = [for bucket in aws_s3_bucket.pilgrim : bucket.arn]
+  }
+  statement {
+    actions   = ["s3:GetObject"]
+    resources = [for bucket in aws_s3_bucket.pilgrim : "${bucket.arn}/*"]
+  }
 }
 
 data "aws_iam_policy_document" "s3_read_write" {
@@ -74,14 +75,45 @@ data "aws_iam_policy_document" "s3_read_write" {
   }
 }
 
+data "aws_iam_policy_document" "secrets_read" {
+  statement {
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = [local.db_secret_arn]
+  }
+}
+
+data "aws_iam_policy_document" "logs_read_write" {
+  statement {
+    actions   = ["logs:*"]
+    resources = ["*"]
+  }
+}
+
+###############################################################################
+# IAM USERS
+###############################################################################
+resource "aws_iam_user" "mac_studio" {
+  name = "mac-studio"
+}
+
 resource "aws_iam_user_policy" "mac_studio_s3" {
-  name   = "pilgrim-buckets-read-write"
+  name   = "mac-buckets-read-write"
   user   = aws_iam_user.mac_studio.name
   policy = data.aws_iam_policy_document.s3_read_write.json
 }
 
 resource "aws_iam_user_policy" "mac_studio_secrets" {
-  name = "pilgrim-secrets-read"
+  name = "mac-secrets-read"
   user = aws_iam_user.mac_studio.name
   policy = data.aws_iam_policy_document.secrets_read.json
+}
+
+resource "aws_iam_user" "logs" {
+  name = "kenny-logger"
+}
+
+resource "aws_iam_user_policy" "logs" {
+  name = "logs-read-write"
+  user = aws_iam_user.logs.name
+  policy = data.aws_iam_policy_document.logs_read_write.json
 }
