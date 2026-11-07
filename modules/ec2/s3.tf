@@ -1,6 +1,6 @@
 resource "aws_s3_bucket" "pilgrim" {
   for_each = toset(["public", "private"])
-  bucket   = "pilgrim-dot-farm-${each.key}"
+  bucket   = "pilgrim-dot-farm-${each.key}-2"
 }
 
 # Public content is served through CloudFront; neither bucket allows direct public access.

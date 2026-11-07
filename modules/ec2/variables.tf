@@ -1,9 +1,9 @@
 variable "aws_region" {
-  default = "us-west-1"
+  default = "us-west-2"
 }
 
 variable "ami_id" {
-  default = "ami-0151cebd38515a41d"
+  default = "ami-09f02015912e773f7"
 }
 
 variable "key_name" {
@@ -83,7 +83,7 @@ variable "ecs_container_image" {
 variable "ecs_release" {
   description = "Change this value to create a new task definition revision and redeploy the current image tag."
   type        = string
-  default     = "4"
+  default     = "5"
 }
 
 variable "ecs_container_port" {
