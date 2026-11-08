@@ -1,31 +1,8 @@
+###############################################################################
+# GENERAL NETWORK
+###############################################################################
 variable "aws_region" {
   default = "us-west-2"
-}
-
-variable "ami_id" {
-  default = "ami-09f02015912e773f7"
-}
-
-variable "key_name" {
-  default = "pg"
-}
-
-variable "domain_name" {
-  default = "pilgrim.farm"
-}
-
-variable "instance_name" {
-  description = "Name tag for the EC2 instance and related resources"
-  default     = "pg"
-}
-
-variable "instance_type" {
-  default = "c7i-flex.large"
-}
-
-variable "disk_size" {
-  description = "Root volume size in GB"
-  default     = 32
 }
 
 variable "ssh_cidr_blocks" {
@@ -70,8 +47,43 @@ variable "db_port" {
   default = 5432
 }
 
+###############################################################################
+# EC2 SETTINGS
+###############################################################################
+variable "ami_id" {
+  default = "ami-09f02015912e773f7"
+}
+
+variable "key_name" {
+  default = "pg"
+}
+
+variable "domain_name" {
+  default = "pilgrim.farm"
+}
+
+variable "instance_name" {
+  description = "Name tag for the EC2 instance and related resources"
+  default     = "pg"
+}
+
+variable "instance_type" {
+  default = "c7i-flex.large"
+}
+
+variable "disk_size" {
+  description = "Root volume size in GB"
+  default     = 32
+}
+
+
+###############################################################################
+# ECS SETTINGS
+###############################################################################
 variable "ecs_count" {
-  default = 1
+  description = "Initial desired task count; autoscaling manages the running count within 1 to 5 tasks."
+  type        = number
+  default     = 1
 }
 
 variable "ecs_container_image" {
@@ -90,9 +102,12 @@ variable "ecs_container_port" {
   description = "Port the application container listens on; the existing security group allows 8080 from the ALB."
   type        = number
   default     = 8080
+}
 
-  validation {
-    condition     = var.ecs_container_port >= 1 && var.ecs_container_port <= 65535 && floor(var.ecs_container_port) == var.ecs_container_port
-    error_message = "ecs_container_port must be an integer between 1 and 65535."
-  }
+variable "ecs_cpu_target_percent" {
+  default = 60
+}
+
+variable "ecs_cpu_memory_percent" {
+  default = 75
 }

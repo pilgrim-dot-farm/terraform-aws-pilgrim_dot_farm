@@ -17,8 +17,37 @@ module "ecs" {
       cpu                      = 1024 # 2x min
       memory                   = 2048 # 2x min
       desired_count            = var.ecs_count
-      enable_autoscaling       = false
+      enable_autoscaling       = true
       enable_execute_command   = false
+
+      autoscaling_min_capacity = 1
+      autoscaling_max_capacity = 5
+      autoscaling_policies = {
+        cpu = {
+          policy_type = "TargetTrackingScaling"
+          target_tracking_scaling_policy_configuration = {
+            predefined_metric_specification = {
+              predefined_metric_type = "ECSServiceAverageCPUUtilization"
+            }
+            target_value       = var.ecs_cpu_target_percent
+            scale_out_cooldown = 60
+            scale_in_cooldown  = 300
+            disable_scale_in   = false
+          }
+        }
+        memory = {
+          policy_type = "TargetTrackingScaling"
+          target_tracking_scaling_policy_configuration = {
+            predefined_metric_specification = {
+              predefined_metric_type = "ECSServiceAverageMemoryUtilization"
+            }
+            target_value       = var.ecs_cpu_memory_percent
+            scale_out_cooldown = 60
+            scale_in_cooldown  = 300
+            disable_scale_in   = false
+          }
+        }
+      }
 
       health_check_grace_period_seconds = 60
       deployment_circuit_breaker = {
