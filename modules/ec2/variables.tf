@@ -48,6 +48,13 @@ variable "db_port" {
 }
 
 ###############################################################################
+# ELASTICACHE SETTINGS
+###############################################################################
+variable "cache_ecpu_per_second" {
+  default = 25000
+}
+
+###############################################################################
 # EC2 SETTINGS
 ###############################################################################
 variable "ami_id" {
@@ -95,7 +102,7 @@ variable "ecs_container_image" {
 variable "ecs_release" {
   description = "Change this value to create a new task definition revision and redeploy the current image tag."
   type        = string
-  default     = "14"
+  default     = "20"
 }
 
 variable "ecs_container_port" {

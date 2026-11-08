@@ -20,7 +20,7 @@ resource "aws_elasticache_serverless_cache" "cache" {
     }
 
     ecpu_per_second {
-      maximum = 1000
+      maximum = var.cache_ecpu_per_second
     }
   }
 
