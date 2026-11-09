@@ -102,7 +102,7 @@ variable "ecs_container_image" {
 variable "ecs_release" {
   description = "Change this value to create a new task definition revision and redeploy the current image tag."
   type        = string
-  default     = "20"
+  default     = "21"
 }
 
 variable "ecs_container_port" {
