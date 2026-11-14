@@ -11,6 +11,7 @@ module "ecs" {
   services = var.ecs_container_image == null ? {} : {
     app = {
       name                     = "${var.instance_name}-app"
+      service_tags             = { prometheus_scrape = "true" }
       launch_type              = "FARGATE"
       requires_compatibilities = ["FARGATE"]
       platform_version         = "1.4.0"
@@ -83,11 +84,18 @@ module "ecs" {
             release = var.ecs_release
           }
 
-          portMappings = [{
-            name          = "http"
-            containerPort = var.ecs_container_port
-            protocol      = "tcp"
-          }]
+          portMappings = [
+            {
+              name          = "http"
+              containerPort = var.ecs_container_port
+              protocol      = "tcp"
+            },
+            {
+              name          = "metrics"
+              containerPort = var.ecs_metrics_port
+              protocol      = "tcp"
+            },
+          ]
 
           healthCheck = {
             command = [

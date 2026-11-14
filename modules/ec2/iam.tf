@@ -94,6 +94,13 @@ data "aws_iam_policy_document" "logs_read_write" {
   }
 }
 
+data "aws_iam_policy_document" "cloudwatch" {
+  statement {
+    actions   = ["cloudwatch:*"]
+    resources = ["*"]
+  }
+}
+
 ###############################################################################
 # IAM USERS
 ###############################################################################
@@ -108,8 +115,8 @@ resource "aws_iam_user_policy" "mac_studio_s3" {
 }
 
 resource "aws_iam_user_policy" "mac_studio_secrets" {
-  name = "mac-secrets-read"
-  user = aws_iam_user.mac_studio.name
+  name   = "mac-secrets-read"
+  user   = aws_iam_user.mac_studio.name
   policy = data.aws_iam_policy_document.secrets_read.json
 }
 
@@ -120,7 +127,33 @@ resource "aws_iam_user" "logs" {
 resource "aws_iam_user_policy" "logs" {
   for_each = local.log_read_write_users
 
-  name = "${each.value}-logs-read-write"
-  user = each.value
+  name   = "${each.value}-logs-read-write"
+  user   = each.value
   policy = data.aws_iam_policy_document.logs_read_write.json
+}
+
+resource "aws_iam_user_policy" "cloudwatch" {
+  name   = "cloudwatch-read-write"
+  user   = aws_iam_user.logs.name
+  policy = data.aws_iam_policy_document.cloudwatch.json
+}
+
+# ECS discovery for the NAS Prometheus (MONITORING.md): it finds the web
+# tier's task IPs by service tag `prometheus_scrape=true`. Read-only.
+data "aws_iam_policy_document" "ecs_discovery" {
+  statement {
+    actions = [
+      "ecs:ListClusters", "ecs:DescribeClusters",
+      "ecs:ListServices", "ecs:DescribeServices",
+      "ecs:ListTasks", "ecs:DescribeTasks",
+      "ec2:DescribeNetworkInterfaces",
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_user_policy" "ecs_discovery" {
+  name   = "ecs-discovery-read"
+  user   = aws_iam_user.logs.name
+  policy = data.aws_iam_policy_document.ecs_discovery.json
 }

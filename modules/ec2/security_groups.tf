@@ -47,6 +47,17 @@ resource "aws_vpc_security_group_ingress_rule" "litellm_relay" {
   ip_protocol                  = "tcp"
 }
 
+# Prometheus scrape of the web tier, through the bastion's subnet route
+# (MONITORING.md). The NAS arrives SNAT'd as the bastion, which shares this
+# group, so the rule references itself. Never registered with the ALB.
+resource "aws_vpc_security_group_ingress_rule" "metrics" {
+  security_group_id            = aws_security_group.pg.id
+  referenced_security_group_id = aws_security_group.pg.id
+  from_port                    = var.ecs_metrics_port
+  to_port                      = var.ecs_metrics_port
+  ip_protocol                  = "tcp"
+}
+
 # Tailscale
 resource "aws_vpc_security_group_ingress_rule" "ts" {
   security_group_id = aws_security_group.pg.id

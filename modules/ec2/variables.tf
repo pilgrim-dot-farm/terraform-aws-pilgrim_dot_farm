@@ -102,13 +102,19 @@ variable "ecs_container_image" {
 variable "ecs_release" {
   description = "Change this value to create a new task definition revision and redeploy the current image tag."
   type        = string
-  default     = "24"
+  default     = "27"
 }
 
 variable "ecs_container_port" {
   description = "Port the application container listens on; the existing security group allows 8080 from the ALB."
   type        = number
   default     = 8080
+}
+
+variable "ecs_metrics_port" {
+  description = "Prometheus /metrics listener in the web container. Never registered with the ALB."
+  type        = number
+  default     = 9102
 }
 
 variable "ecs_cpu_target_percent" {
