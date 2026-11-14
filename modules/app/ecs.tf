@@ -61,9 +61,9 @@ module "ecs" {
         operating_system_family = "LINUX"
       }
 
-      subnet_ids            = local.private_subnet_ids
+      subnet_ids            = var.private_subnet_ids
       create_security_group = false
-      security_group_ids    = local.front_end_sg_ids
+      security_group_ids    = var.front_end_sg_ids
 
       # ECS registers and deregisters task IPs as tasks start and stop.
       load_balancer = {
@@ -119,14 +119,14 @@ module "ecs" {
         }
       }
 
-      iam_role_arn = local.pg_role_arn
+      iam_role_arn = var.app_role_arn
 
       # The application reads its database and Stripe secrets at runtime.
       # The execution role needs no secret access: there are no `secrets:` entries.
       tasks_iam_role_statements = [
         {
           actions   = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
-          resources = [local.db_secret_arn, local.stripe_secret_arn]
+          resources = [var.db_secret_arn, var.stripe_secret_arn]
         }
       ]
 
@@ -139,10 +139,9 @@ module "ecs" {
     Name = "${var.instance_name}-ecs"
   }
 
-  # Wait for both the ALB association and private-subnet egress before starting tasks.
+  # Wait for the ALB association. Private-subnet egress and the Stripe secret
+  # version live in other units; Terragrunt dependencies order those first.
   depends_on = [
     aws_lb_listener.https,
-    aws_route_table_association.private,
-    aws_secretsmanager_secret_version.stripe,
   ]
 }

@@ -7,10 +7,10 @@ resource "aws_instance" "pg" {
   ami                         = var.ami_id
   instance_type               = var.instance_type
   key_name                    = data.aws_key_pair.pg.key_name
-  subnet_id                   = data.aws_subnet.public[0].id
-  vpc_security_group_ids      = local.front_end_sg_ids
+  subnet_id                   = var.ec2_subnet_id
+  vpc_security_group_ids      = var.front_end_sg_ids
   associate_public_ip_address = true
-  iam_instance_profile        = aws_iam_instance_profile.pg.name
+  iam_instance_profile        = var.instance_profile_name
 
   metadata_options {
     http_endpoint               = "enabled"

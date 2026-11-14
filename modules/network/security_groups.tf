@@ -61,7 +61,7 @@ resource "aws_vpc_security_group_ingress_rule" "metrics" {
 # Tailscale
 resource "aws_vpc_security_group_ingress_rule" "ts" {
   security_group_id = aws_security_group.pg.id
-  cidr_ipv4         = "203.0.113.10/32"
+  cidr_ipv4         = var.tailscale_cidr_block
   from_port         = 41641
   to_port           = 41641
   ip_protocol       = "udp"

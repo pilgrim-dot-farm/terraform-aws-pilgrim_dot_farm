@@ -54,11 +54,11 @@ resource "aws_iam_role_policy" "pg_logs_read_write" {
 data "aws_iam_policy_document" "s3_read" {
   statement {
     actions   = ["s3:ListBucket", "s3:GetBucketLocation"]
-    resources = [for bucket in aws_s3_bucket.pilgrim : bucket.arn]
+    resources = [for arn in var.bucket_arns : arn]
   }
   statement {
     actions   = ["s3:GetObject"]
-    resources = [for bucket in aws_s3_bucket.pilgrim : "${bucket.arn}/*"]
+    resources = [for arn in var.bucket_arns : "${arn}/*"]
   }
 }
 
@@ -67,7 +67,7 @@ data "aws_iam_policy_document" "s3_read_write" {
 
   statement {
     actions   = ["s3:ListBucketMultipartUploads"]
-    resources = [for bucket in aws_s3_bucket.pilgrim : bucket.arn]
+    resources = [for arn in var.bucket_arns : arn]
   }
   statement {
     actions = [
@@ -76,14 +76,14 @@ data "aws_iam_policy_document" "s3_read_write" {
       "s3:AbortMultipartUpload",
       "s3:ListMultipartUploadParts",
     ]
-    resources = [for bucket in aws_s3_bucket.pilgrim : "${bucket.arn}/*"]
+    resources = [for arn in var.bucket_arns : "${arn}/*"]
   }
 }
 
 data "aws_iam_policy_document" "secrets_read" {
   statement {
     actions   = ["secretsmanager:GetSecretValue"]
-    resources = [local.db_secret_arn]
+    resources = [var.db_secret_arn]
   }
 }
 

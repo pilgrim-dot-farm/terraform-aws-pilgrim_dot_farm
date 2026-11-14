@@ -8,8 +8,8 @@ resource "aws_elasticache_serverless_cache" "cache" {
   engine               = "valkey"
   major_engine_version = "9"
 
-  subnet_ids         = local.private_subnet_ids
-  security_group_ids = [aws_security_group.cache.id]
+  subnet_ids         = var.private_subnet_ids
+  security_group_ids = [var.cache_security_group_id]
 
   snapshot_retention_limit = 0
 

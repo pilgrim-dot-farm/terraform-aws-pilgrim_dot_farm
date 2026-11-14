@@ -1,0 +1,14 @@
+# Terraform / Terragrunt working files. Lockfiles stay tracked.
+.terraform/
+.terragrunt-cache/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tar
+
+# Local credentials and migration recovery artifacts.
+/secrets/
+.migration/
+.mcp.json
+private.hcl
+*.tfvars

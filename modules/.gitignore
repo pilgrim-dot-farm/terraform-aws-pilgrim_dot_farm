@@ -1,7 +1,0 @@
-.mcp.json
-.terraform
-terraform.tfstate.backup
-
-# Local Stripe credentials used to populate Secrets Manager.
-/ec2/stripe.json
-

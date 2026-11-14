@@ -36,8 +36,8 @@ resource "aws_lb" "pg" {
   name               = "${var.instance_name}-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.lb.id]
-  subnets            = data.aws_subnets.public.ids
+  security_groups    = [var.lb_security_group_id]
+  subnets            = var.public_subnet_ids
   idle_timeout       = 300
 
   tags = {
@@ -69,7 +69,7 @@ resource "aws_lb_target_group" "pg" {
   port        = 8080
   protocol    = "HTTP"
   target_type = "ip"
-  vpc_id      = data.aws_vpc.default.id
+  vpc_id      = var.vpc_id
 
   # Traffic-path check from the ALB. /api/health is always 200 while the app
   # runs (an off-air station still answers), so a failure here means the task

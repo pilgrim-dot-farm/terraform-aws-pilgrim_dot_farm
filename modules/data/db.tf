@@ -4,7 +4,7 @@ locals {
 
 resource "aws_db_subnet_group" "db_private" {
   name       = "${var.instance_name}-db-private"
-  subnet_ids = local.private_subnet_ids
+  subnet_ids = var.private_subnet_ids
 
   tags = {
     Name = "${var.instance_name}-db-private"
@@ -26,7 +26,7 @@ resource "aws_db_instance" "db" {
   manage_master_user_password  = true
   port                         = var.db_port
   db_subnet_group_name         = aws_db_subnet_group.db_private.name
-  vpc_security_group_ids       = [aws_security_group.db.id]
+  vpc_security_group_ids       = [var.db_security_group_id]
   publicly_accessible          = false
   multi_az                     = false
   auto_minor_version_upgrade   = true
