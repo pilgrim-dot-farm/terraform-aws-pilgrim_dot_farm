@@ -21,7 +21,7 @@ dependency "identity" {
 inputs = {
   # Release controls: bump ecs_release to redeploy an image published under the same tag.
   ecs_container_image = "pilgrimdotfarm/front-end:latest"
-  ecs_release         = "27"
+  ecs_release         = "31"
   ecs_count           = 1
 
   vpc_id               = dependency.network.outputs.vpc_id
